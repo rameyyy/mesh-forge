@@ -1,0 +1,25 @@
+# Refine Later
+docs/
+
+# Node          
+node_modules                                                                 
+dist
+out
+*.log*
+                                                                                        
+# Python
+.venv                                                                                    
+__pycache__     
+*.pyc
+
+# Database
+*.db
+*.db-journal
+
+# IDE
+.DS_Store
+.eslintcache
+
+# Environment                                                                            
+.env
+.env.local
