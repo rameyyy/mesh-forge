@@ -1,0 +1,29 @@
+body {          
+    margin: 0;                                                                                  
+    padding: 0;   
+    background: #a6acb1;  /* Light gray background */
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #333;                                                                                
+}             
+                                                                                            
+#root {         
+    height: 100vh;                                                                              
+    display: flex;
+    flex-direction: column;                                                                     
+}               
+
+.app {
+    height: 100vh;
+    display: flex;                                                                              
+    flex-direction: column;
+}                                                                                             
+                
+.app-body {
+    flex: 1;
+    display: flex;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem;
+}     
