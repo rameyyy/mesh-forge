@@ -1,34 +1,26 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import './App.css'
+
+import Header from './components/Header'
+import Sidebar from './components/Sidebar'
+import ViewerPage from './pages/ViewerPage'
+import ScansPage from './pages/ScansPage'
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
+    <BrowserRouter>
+      <div className='app'>
+        <Header />
+        <div className='app-body'>
+          <Sidebar />
+          <Routes>                                                                                
+            <Route path="/" element={<ViewerPage />} />
+            <Route path="/scans" element={<ScansPage />} />                                       
+          </Routes> 
         </div>
       </div>
-      <Versions></Versions>
-    </>
+    </BrowserRouter>
   )
 }
 

@@ -1,0 +1,40 @@
+.sidebar {
+    width: 80px;
+    background: #34495e;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+    width: 30px;
+    padding: 1rem 0.5rem;
+}
+
+.toggle-btn {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    padding: 0.5rem;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.toggle-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.sidebar a {
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem;
+    border-radius: 4px;
+}
+
+.sidebar a:hover {
+    background: rgba(255,255,255,0.1);
+}      
