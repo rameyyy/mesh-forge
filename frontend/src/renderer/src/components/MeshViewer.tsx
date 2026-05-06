@@ -51,13 +51,16 @@ function MeshViewer() {
             renderer.render(scene, camera)
         }
 
+        let mesh: THREE.Mesh | null = null
+        const raycaster = new THREE.Raycaster()
+
         // Load bunny
         const loader = new PLYLoader()
         loader.load(
             bunnyPath,
             (geometry) => {
                 const material = new THREE.MeshStandardMaterial({ color: 0x888888 })
-                const mesh = new THREE.Mesh(geometry, material)
+                mesh = new THREE.Mesh(geometry, material)
 
                 // Center the mesh in main view tsx
                 geometry.computeBoundingBox()
@@ -74,6 +77,24 @@ function MeshViewer() {
             }
         )
 
+        const handleClick = (event: MouseEvent) => {
+            const rect = renderer.domElement.getBoundingClientRect()
+            const x = event.clientX - rect.left
+            const y = event.clientY - rect.top
+            const ndcX = (x / rect.width) * 2 - 1
+            const ndcY = -(y / rect.height) * 2 + 1
+            const vec2 = new THREE.Vector2(ndcX, ndcY)
+            raycaster.setFromCamera(vec2,camera)
+            if (!mesh) return
+            const intersects = raycaster.intersectObject(mesh)
+            if (intersects.length > 0) {
+                const hitPoint = intersects[0].point
+                console.log('Hit Point:', hitPoint.x, hitPoint.y, hitPoint.z)
+            }
+        }
+
+        renderer.domElement.addEventListener('click', handleClick)
+
         // Start animation loop
         animate()
 
@@ -81,6 +102,7 @@ function MeshViewer() {
         return () => {
             renderer.dispose()
             controls.dispose()
+            renderer.domElement.removeEventListener('click', handleClick)
         }
     }, [])
 
