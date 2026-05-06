@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -6,6 +6,9 @@ import bunnyPath from '../assets/bunny.ply?url'
 
 function MeshViewer() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const [hitPoint, setHitPoint] = useState<THREE.Vector3 | null>(null)
+    const [radius, setRadius] = useState(0.02)                                  
+    const [height, setHeight] = useState(0.01)
 
     useEffect(() => {
         if (!canvasRef.current) return
@@ -51,13 +54,16 @@ function MeshViewer() {
             renderer.render(scene, camera)
         }
 
+        let mesh: THREE.Mesh | null = null
+        const raycaster = new THREE.Raycaster()
+
         // Load bunny
         const loader = new PLYLoader()
         loader.load(
             bunnyPath,
             (geometry) => {
                 const material = new THREE.MeshStandardMaterial({ color: 0x888888 })
-                const mesh = new THREE.Mesh(geometry, material)
+                mesh = new THREE.Mesh(geometry, material)
 
                 // Center the mesh in main view tsx
                 geometry.computeBoundingBox()
@@ -74,6 +80,34 @@ function MeshViewer() {
             }
         )
 
+        const markerGeometry = new THREE.SphereGeometry(0.005,16,16)
+        const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        const marker = new THREE.Mesh(markerGeometry,markerMaterial)
+        marker.visible = false
+        scene.add(marker)
+
+        const handleClick = (event: MouseEvent) => {
+            const rect = renderer.domElement.getBoundingClientRect()
+            const x = event.clientX - rect.left
+            const y = event.clientY - rect.top
+            const ndcX = (x / rect.width) * 2 - 1
+            const ndcY = -(y / rect.height) * 2 + 1
+            const vec2 = new THREE.Vector2(ndcX, ndcY)
+            raycaster.setFromCamera(vec2,camera)
+            if (!mesh) return
+            const intersects = raycaster.intersectObject(mesh)
+            if (intersects.length > 0) {
+                const hitPoint = intersects[0].point
+                console.log('Hit Point:', hitPoint.x, hitPoint.y, hitPoint.z)
+                marker.position.copy(hitPoint)
+                marker.visible = true
+                setHitPoint(hitPoint.clone())
+                
+            }
+        }
+
+        renderer.domElement.addEventListener('click', handleClick)
+
         // Start animation loop
         animate()
 
@@ -81,6 +115,7 @@ function MeshViewer() {
         return () => {
             renderer.dispose()
             controls.dispose()
+            renderer.domElement.removeEventListener('click', handleClick)
         }
     }, [])
 
