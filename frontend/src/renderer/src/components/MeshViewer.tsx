@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import * as THREE from 'three'
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -6,6 +6,9 @@ import bunnyPath from '../assets/bunny.ply?url'
 
 function MeshViewer() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
+    const [hitPoint, setHitPoint] = useState<THREE.Vector3 | null>(null)
+    const [radius, setRadius] = useState(0.02)                                  
+    const [height, setHeight] = useState(0.01)
 
     useEffect(() => {
         if (!canvasRef.current) return
@@ -77,6 +80,12 @@ function MeshViewer() {
             }
         )
 
+        const markerGeometry = new THREE.SphereGeometry(0.005,16,16)
+        const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        const marker = new THREE.Mesh(markerGeometry,markerMaterial)
+        marker.visible = false
+        scene.add(marker)
+
         const handleClick = (event: MouseEvent) => {
             const rect = renderer.domElement.getBoundingClientRect()
             const x = event.clientX - rect.left
@@ -90,6 +99,10 @@ function MeshViewer() {
             if (intersects.length > 0) {
                 const hitPoint = intersects[0].point
                 console.log('Hit Point:', hitPoint.x, hitPoint.y, hitPoint.z)
+                marker.position.copy(hitPoint)
+                marker.visible = true
+                setHitPoint(hitPoint.clone())
+                
             }
         }
 
