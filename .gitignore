@@ -13,7 +13,6 @@ __pycache__
 *.pyc
 
 # Database
-*.db
 *.db-journal
 
 # IDE
