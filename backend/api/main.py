@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+import db_io
 
 app = FastAPI()
 
@@ -9,8 +10,8 @@ class Coordinates(BaseModel):
     y: float
     z: float
 
-coords_inmem_db = []
-id = 0
+coords_id = 1
+run_id = db_io.get_new_run_id()
 
 @app.get("/status")
 async def root():
@@ -18,39 +19,35 @@ async def root():
 
 @app.post("/coords")
 async def receive_coords(coords: Coordinates):
-    global id
-    coords_inmem_db.append({
-        "id": id,
-        "x": coords.x,
-        "y": coords.y,
-        "z": coords.z
-        })
-    id+=1
+    global coords_id
+    global run_id
+    res = db_io.post_coords(run_id, coords_id, coords.x, coords.y, coords.z)
+    if res:
+        coords_id+=1
+        return {
+            "message": f"coords saved to id={coords_id-1}",
+            "data": coords
+        }
+    else:
+        return {
+            "message": "failed to save coords to db",
+        }
+
+@app.delete("/coords/del/{coord_id_del}")
+async def delete_coords(coord_id_del: int):
+    global run_id
+    res = db_io.del_coords(run_id, coord_id_del)
     return {
-        "message": f"coords saved to id={id}",
-        "data": coords
+        f"Successfully deleted coordinate at id={coord_id_del}": f"{res}"
     }
 
-@app.delete("/coords/del/{id}")
-async def delete_coords(id: int):
-    # binary search O(logn) + O(n) del element from dynamic arr => O(n) to find and del coords at specific id
-    res = False
-    left = 0
-    right = len(coords_inmem_db) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if coords_inmem_db[mid]["id"] == id:
-            del coords_inmem_db[mid]
-            res = True
-            break
-        elif coords_inmem_db[mid]["id"] < id:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return {
-        f"Successfully deleted coordinate at id={id}": f"{res}"
-    }
+@app.get("/run-coords")
+async def get_run_id_coords():
+    global run_id
+    runs_coords = db_io.get_coords_from_run(run_id)
+    return runs_coords
 
 @app.get("/all-coords")
 async def get_all_coords():
-    return coords_inmem_db
+    all_coords = db_io.get_all_coords()
+    return all_coords
