@@ -7,8 +7,18 @@ import bunnyPath from '../assets/bunny.ply?url'
 function MeshViewer() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const [hitPoint, setHitPoint] = useState<THREE.Vector3 | null>(null)
-    const [radius, setRadius] = useState(0.02)                                  
+    const [radius, setRadius] = useState(0.02)
     const [height, setHeight] = useState(0.01)
+
+    const handleAddToDb = async () => {
+            if (!hitPoint) return
+            const result = await window.api.saveCoords({
+                x: hitPoint.x,
+                y: hitPoint.y,
+                z: hitPoint.z
+            })
+            console.log('Saved coords!', result)
+    }
 
     useEffect(() => {
         if (!canvasRef.current) return
@@ -119,7 +129,28 @@ function MeshViewer() {
         }
     }, [])
 
-    return <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
+    return (
+        <div style={{ position: 'relative', width: '100%', height: '100%'}}>
+            <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
+            
+            {hitPoint && (
+                <div style = {{
+                    position: 'absolute',
+                    top: 10,
+                    right: 10,
+                    background: 'rgba(0,0,0,0.8)',
+                    color: 'white',
+                    padding: '12px',
+                    borderRadius: '4px'
+                }}>
+                    <p>X: {hitPoint.x.toFixed(4)}</p>
+                    <p>Y: {hitPoint.y.toFixed(4)}</p>
+                    <p>Z: {hitPoint.z.toFixed(4)}</p>
+                    <button onClick={handleAddToDb}>Add Coords to DB</button>
+                </div>
+            )}
+        </div>
+    )
 }
 
 export default MeshViewer 

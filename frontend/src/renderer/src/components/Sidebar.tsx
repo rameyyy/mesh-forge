@@ -18,7 +18,7 @@ function Sidebar(): React.JSX.Element {
             {isOpen && (
                 <>
                     <Link to="/">Viewer</Link>
-                    <Link to="/scans">Scans</Link>
+                    <Link to="/scans">Coords</Link>
                 </>
             )}
         </nav>
