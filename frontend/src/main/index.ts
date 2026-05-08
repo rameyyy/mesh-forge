@@ -49,8 +49,36 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
+  // IPC
+  ipcMain.on('ping', () => console.log('pong')) // demo test
+  ipcMain.handle('save-coords', async (_event, coords) => {
+    const response = await fetch('http://localhost:8000/coords', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(coords)
+    })
+    return await response.json()
+  })
+  ipcMain.handle('run-coords', async (_event) => {
+    const response = await fetch('http://localhost:8000/run-coords', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    return await response.json()
+  })
+  ipcMain.handle('all-coords', async (_event) => {
+    const response = await fetch('http://localhost:8000/all-coords', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    return await response.json()
+  })
+  ipcMain.handle('del-coord', async (_event, coordID) => {
+    const response = await fetch(`http://localhost:8000/coords/del/${coordID}`, {
+      method: 'DELETE',
+    })
+    return await response.json()
+  })
 
   createWindow()
 
